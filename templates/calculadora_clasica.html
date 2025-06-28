@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Clásica de Rutas</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #d9534f;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #d9534f;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #5bc0de;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Calculadora de Ruta Clásica</h1>
+        <p>Selecciona una calle de origen y una de destino para encontrar la ruta más rápida.</p>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/calcular_ruta" method="POST">
+            <div class="form-group">
+                <label for="calle_inicio">Punto de Partida (Calle):</label>
+                <select name="calle_inicio" id="calle_inicio" required>
+                    <option value="">-- Selecciona una calle --</option>
+                    {% for calle in calles %}
+                    <option value="{{ calle }}">{{ calle }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="calle_fin">Punto de Destino (Calle):</label>
+                <select name="calle_fin" id="calle_fin" required>
+                    <option value="">-- Selecciona una calle --</option>
+                    {% for calle in calles %}
+                    <option value="{{ calle }}">{{ calle }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit">Calcular Ruta</button>
+        </form>
+        <br>
+        <a href="/">Volver al Mapa Interactivo</a>
+    </div>
+</body>
+
+</html>
