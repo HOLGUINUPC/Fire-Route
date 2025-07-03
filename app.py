@@ -37,19 +37,39 @@ def cargar_datos_y_crear_grafo(filepath="10000_calles_vecinas_lima.csv"):
     for _, row in df.iterrows():
         costo_base = row["tiempo_estimado_min"]
         nombre_via = row.get("nombre_via", "")
-        if isinstance(nombre_via, str) and (nombre_via.startswith("Jirón") or nombre_via.startswith("Calle")):
-            costo_final = costo_base * 1.5 
-        else:
-            costo_final = costo_base
+        distrito=row.get("distrito", "")
+        punto_inicio = row["punto_inicio"]
+        punto_fin = row["punto_fin"]
+        # Verifica que ambos nodos sean tuplas válidas de longitud 2
+        if (
+            isinstance(punto_inicio, tuple) and len(punto_inicio) == 2 and
+            isinstance(punto_fin, tuple) and len(punto_fin) == 2 and
+            all(isinstance(x, (int, float)) for x in punto_inicio + punto_fin)
+        ):
+            if isinstance(distrito, str) and (distrito.startswith("Miraflores") or distrito.startswith("San Borja")):
+                costo_final = costo_base * 10
+            else:
+                costo_final = costo_base
+            if isinstance(distrito, str) and (distrito.startswith("La Victoria")):
+                costo_final = costo_base * 15
+            else:
+                costo_final = costo_base   
+            if isinstance(distrito, str) and (distrito.startswith("San Isidro")):
+                costo_final = costo_base * 9.5
+            else:    
+                costo_final = costo_base
+            if isinstance(distrito, str) and (distrito.startswith("Surquillo")):
+                costo_final = costo_base * 5
+            else:    
+                costo_final = costo_base
+            G.add_edge(
+                punto_inicio,
+                punto_fin,
+                name=nombre_via,
+                length=row["longitud_metros"],
+                time=costo_final
+            )
 
-        G.add_edge(
-            row["punto_inicio"],
-            row["punto_fin"],
-            name=nombre_via,
-            length=row["longitud_metros"],
-            time=costo_final
-        )
-    
     # Obtenemos la lista de calles para los menús desplegables
     lista_calles_unicas = sorted(df["nombre_via"].unique())
 
@@ -69,11 +89,7 @@ if GRAFO is None:
 # --- Rutas para la Interfaz del MAPA ---
 @app.route('/')
 def index():
-    return render_template('index.html')
-
-@app.route('/acerca')
-def acerca_de():
-    return render_template('acerca.html')
+    return render_template('index2.html')
 
 @app.route('/ruta_json', methods=['POST'])
 def ruta_json():
