@@ -1,0 +1,450 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #fff; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    width: 100vw;
+    overflow: hidden; 
+    box-sizing: border-box;
+}
+
+.app-container {
+    background-color: #fff; 
+    padding: 0; 
+    border-radius: 0;
+    box-shadow: none; 
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-wrapper {
+    background-color: #fff;
+    padding: 20px; 
+    border-radius: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    max-width: none; 
+    box-shadow: none;
+    overflow-y: auto;
+}
+
+.logo-section {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-image {
+    width: 120px; 
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.app-title {
+    font-size: 2.5em;
+    color: #333;
+    margin: 0;
+}
+
+button {
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    width: 100%; 
+    box-sizing: border-box; 
+    margin-bottom: 15px; 
+}
+
+button:hover {
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+    transform: translateY(0); 
+}
+
+.btn-emergency {
+    background-color: #e74c3c; 
+    color: #fff;
+    font-size: 1.5em;
+    padding: 25px 35px;
+    position: relative;
+    margin-bottom: 35px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-emergency:hover {
+    background-color: #c0392b;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background-color: #e74c3c; 
+    color: #fff;
+    font-size: 0.9em;
+    padding: 6px 10px;
+    border-radius: 50%; 
+    border: 3px solid #fff; 
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; 
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.btn-primary {
+    background-color: #3498db; 
+    color: #fff;
+    font-size: 1.2em;
+    flex: 1; 
+    margin-bottom: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-back {
+    background-color: #7f8c8d; 
+    color: #fff;
+    font-size: 1em;
+    padding: 12px 25px;
+    margin-top: 20px;
+    width: auto;
+    max-width: 200px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back:hover {
+    background-color: #6c7a7b;
+}
+
+.screen {
+    display: none; 
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.screen.active-screen {
+    display: flex;
+}
+
+.screen-title {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.emergency-content-layout {
+    display: flex;
+    flex-direction: row; 
+    gap: 20px; 
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    overflow: hidden; 
+}
+
+.control-panel {
+    flex: 0 0 350px;
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    overflow-y: auto; 
+}
+
+.control-panel h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.4em;
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.input-group {
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #555;
+}
+
+.control-input {
+    width: 100%; 
+    padding: 10px;
+    padding-right: 70px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.input-action-btn {
+    position: absolute;
+    top: 50%; 
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    width: 30px; 
+    height: 30px;
+    transition: transform 0.2s;
+}
+
+.input-action-btn:hover {
+    transform: translateY(-50%) scale(1.1); 
+}
+
+.input-action-btn img {
+    width: 100%; 
+    height: 100%;
+    object-fit: contain; 
+}
+
+.input-group .input-action-btn:first-of-type {
+    right: 35px;
+}
+
+
+.input-action-btn.clear-btn {
+    right: 5px; 
+}
+
+
+.btn-calculate {
+    background-color: #e74c3c;
+    color: #fff;
+    font-size: 1.2em;
+    padding: 15px 20px;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+
+.btn-calculate:hover {
+    background-color: #c0392b;
+}
+
+.route-results {
+    width: 100%;
+    background-color: #fff;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.route-results h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.route-results p {
+    margin: 5px 0;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-value {
+    font-weight: 700;
+    color: #333;
+}
+
+.instructions-group {
+    width: 100%;
+    margin-bottom: 20px;
+    position: relative; 
+}
+
+.instructions-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 700;
+    color: #555;
+}
+
+.control-textarea {
+    width: calc(100% - 2px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+    resize: vertical; 
+    min-height: 80px;
+}
+
+.btn-audio-radio {
+    background-color: #9b59b6;
+    color: #fff;
+    padding: 8px 15px;
+    font-size: 0.9em;
+    margin-top: 10px;
+    float: right;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-audio-radio:hover {
+    background-color: #8e44ad;
+}
+
+.data-update-info {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.map-placeholder {
+    flex: 1; 
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    font-size: 1.2em;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    min-height: 300px;
+}
+
+.app-footer {
+    width: 100%;
+    margin-top: auto; 
+    color: #666;
+    font-size: 0.95em;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.app-footer p {
+    margin: 0;
+}
+
+.app-footer a {
+    color: #3498db;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.2s ease;
+}
+
+.app-footer a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+    .emergency-content-layout {
+        flex-direction: column; 
+        align-items: center;
+    }
+    .control-panel {
+        flex: none; 
+        width: 100%;
+        max-width: 450px;
+    }
+    .map-placeholder {
+        flex: none;
+        width: 100%;
+        height: 250px; 
+    }
+    .app-title {
+        font-size: 2em;
+    }
+}
+
+@media (max-width: 600px) {
+    .content-wrapper {
+        padding: 15px;
+    }
+    .logo-image {
+        width: 100px;
+    }
+    .app-title {
+        font-size: 1.8em;
+    }
+    .btn-emergency {
+        font-size: 1.1em;
+        padding: 15px 20px;
+    }
+    .notification-badge {
+        font-size: 0.8em;
+        padding: 4px 8px;
+        top: -8px;
+        right: -8px;
+    }
+    .button-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .btn-primary {
+        font-size: 1em;
+        padding: 12px 15px;
+    }
+    .control-panel {
+        padding: 15px;
+    }
+    .map-placeholder {
+        min-height: 200px; 
+    }
+    .app-footer {
+        font-size: 0.85em;
+    }
+    .app-footer a {
+        margin: 0 5px;
+    }
+    
+}
