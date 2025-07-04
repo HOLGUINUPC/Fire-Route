@@ -37,6 +37,7 @@ def cargar_datos_y_crear_grafo(filepath="10000_calles_vecinas_lima.csv"):
 
     for _, row in df.iterrows():
         distrito=row.get("distrito", "")
+        tipo_via = row.get("tipo_via", "calle") # <<<--- OBTENER EL TIPO DE VÍA (si no existe, se asume 'calle')
         punto_inicio = row["punto_inicio"]
         punto_fin = row["punto_fin"]
 
@@ -53,17 +54,27 @@ def cargar_datos_y_crear_grafo(filepath="10000_calles_vecinas_lima.csv"):
             elif distrito.startswith("Surquillo"):
                 penalty_factor = 2.3
 
+        road_type_multiplier = 1.0
+        if tipo_via == 'avenida':
+            road_type_multiplier = 0.8  # 20% más rápido en avenidas
+        elif tipo_via == 'via expresa':
+            road_type_multiplier = 0.6  # 40% más rápido en vías expresas
+        elif tipo_via == 'jiron':
+            road_type_multiplier = 1.2  # 20% más lento en jirones
+
+
         # --- CAMBIO: GUARDAR TODOS LOS PERFILES DE TIEMPO CON LA PENALIZACIÓN APLICADA ---
         G.add_edge(
             punto_inicio,
             punto_fin,
             name=row.get("nombre_via", ""),
             length=row["longitud_metros"],
-            # Guarda cada perfil de tiempo, ya afectado por la penalización del distrito
-            time_normal=row["tiempo_normal"] * penalty_factor,
-            time_rush_hour=row["tiempo_punta"] * penalty_factor,
-            time_night=row["tiempo_noche"] * penalty_factor
+            # El tiempo base se multiplica por ambos factores
+            time_normal=row["tiempo_normal"] * penalty_factor * road_type_multiplier,
+            time_rush_hour=row["tiempo_punta"] * penalty_factor * road_type_multiplier,
+            time_night=row["tiempo_noche"] * penalty_factor * road_type_multiplier
         )
+        
 
     lista_calles_unicas = sorted(df["nombre_via"].unique())
     print("¡Grafo ponderado cargado exitosamente!")
