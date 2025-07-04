@@ -21,6 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCalcularRuta = document.getElementById('btnCalcularRuta');
     const btnAudioRadio = document.getElementById('btnAudioRadio');
 
+    const elementoHora = document.getElementById('hora-actual');
+
+    function actualizarHora() {
+        const ahora = new Date();
+        // toLocaleTimeString formatea la hora al formato local (ej: 12:27:20 PM)
+        // 'es-PE' es para el formato de Perú.
+        elementoHora.textContent = ahora.toLocaleTimeString('es-PE', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+
+    actualizarHora();
+
+    // Configura un intervalo para que la función se ejecute cada segundo
+    setInterval(actualizarHora, 1000);
+
     function showScreen(screenToShow) {
         if (!screenToShow) {
             console.error("Error: Intentando mostrar una pantalla nula.");
@@ -112,13 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
         "Unidad N-2 Suquillo-",
         "Unidad N-100 San Isidro-C. Godofredo García 439,",
 
-        { nombre: "Unidad N-11 San Borja-Claudio Galeno 200", lat: -12.106924903119632, lng:-77.00736715413291},
-        { nombre: "Unidad N-28 Miraflores-Av. Andrés Avelino Cáceres 172", lat: -12.119742044236054, lng:-77.02273735483284},
-        { nombre: "Unidad N-8 La Victoria-Jr. Manuel Cisneros 597", lat: -12.067531374600396,lng:-77.02116186429399},
-        { nombre: "Unidad N-2 Suquillo-", lat: -12.106924903119632, lng:-77.00736715413291},
-        { nombre: "Unidad N-100 San Isidro-C. Godofredo García 439,", lat: -12.10653801709604, lng:-77.05435961047738},
+        { nombre: "Unidad N-11 San Borja-Claudio Galeno 200", lat: -12.106924903119632, lng: -77.00736715413291 },
+        { nombre: "Unidad N-28 Miraflores-Av. Andrés Avelino Cáceres 172", lat: -12.119742044236054, lng: -77.02273735483284 },
+        { nombre: "Unidad N-8 La Victoria-Jr. Manuel Cisneros 597", lat: -12.067531374600396, lng: -77.02116186429399 },
+        { nombre: "Unidad N-2 Suquillo-", lat: -12.106924903119632, lng: -77.00736715413291 },
+        { nombre: "Unidad N-100 San Isidro-C. Godofredo García 439,", lat: -12.10653801709604, lng: -77.05435961047738 },
 
-    
+
     ];
     if (unidadesDatalist) {
         populateDatalist(unidadesDatalist, unidadesData.map(u => u.nombre));
