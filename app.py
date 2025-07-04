@@ -89,7 +89,6 @@ if GRAFO is None:
 @app.route('/')
 def index():
     return render_template('index.html')
-
 @app.route('/ruta_json', methods=['POST'])
 def ruta_json():
     data = request.get_json()
@@ -101,40 +100,64 @@ def ruta_json():
     if not start_node or not end_node or start_node == end_node:
         return jsonify({'error': 'No se pudieron encontrar nodos válidos.'}), 400
     try:
-        # --- CAMBIO: LÓGICA PARA ELEGIR EL PESO SEGÚN LA HORA ---
-        current_hour = datetime.now().hour # Obtiene la hora actual del servidor (0-23)
-        
-        # Define los rangos de hora
-        if 7 <= current_hour < 10 or 17 <= current_hour < 20: # De 7-9am y 5-7pm
+        # Lógica para elegir el peso según la hora
+        current_hour = datetime.now().hour
+        if 7 <= current_hour < 10 or 17 <= current_hour < 20:
             weight_key = 'time_rush_hour'
-            print("Cálculo con perfil: HORA PUNTA")
-        elif 23 <= current_hour or current_hour < 6: # De 11pm a 5am
+        elif 23 <= current_hour or current_hour < 6:
             weight_key = 'time_night'
-            print("Cálculo con perfil: NOCHE")
-        else: # El resto del día
+        else:
             weight_key = 'time_normal'
-            print("Cálculo con perfil: NORMAL")
-        # --- FIN DEL CAMBIO ---
 
         def heuristica(u, v): return geodesic(u, v).meters
         
-        # --- CAMBIO: USA LA LLAVE DE PESO DINÁMICA ---
+        # Se calcula la ruta como antes
         ruta_nodos = nx.astar_path(GRAFO, source=start_node, target=end_node, heuristic=heuristica, weight=weight_key)
         
-        tiempo_total, distancia_total = 0, 0
+        tiempo_total = 0
+        distancia_total = 0
+        instrucciones_detalladas = [] # <<<--- Lista para guardar los pasos
+
+        # Recorre la ruta para construir las instrucciones
         for i in range(len(ruta_nodos) - 1):
-            edge_data = GRAFO.get_edge_data(ruta_nodos[i], ruta_nodos[i+1])
-            # --- CAMBIO: USA LA MISMA LLAVE PARA SUMAR EL TIEMPO ---
-            tiempo_total += edge_data.get(weight_key, 0)
-            distancia_total += edge_data.get('length', 0)
+            u = ruta_nodos[i]
+            v = ruta_nodos[i+1]
+            edge_data = GRAFO.get_edge_data(u, v)
             
-        return jsonify({'ruta': ruta_nodos, 'tiempo': tiempo_total, 'distancia': distancia_total / 1000})
+            # Obtiene los datos de este tramo de calle
+            tiempo_segmento = edge_data.get(weight_key, 0)
+            distancia_segmento = edge_data.get('length', 0)
+            nombre_calle = edge_data.get('name', 'Calle desconocida')
+
+            tiempo_total += tiempo_segmento
+            distancia_total += distancia_segmento
+
+            # Crea un objeto con los detalles del paso
+            paso_actual = {
+                "calle": nombre_calle,
+                "tiempo": round(tiempo_segmento, 2),
+                "distancia_km": round(distancia_segmento / 1000, 2)
+            }
+            
+            # Agrupa las instrucciones para que no se repita la misma calle seguida
+            if not instrucciones_detalladas or instrucciones_detalladas[-1]["calle"] != nombre_calle:
+                 instrucciones_detalladas.append(paso_actual)
+            else:
+                # Si es la misma calle, solo suma el tiempo y la distancia al último paso
+                instrucciones_detalladas[-1]["tiempo"] += round(tiempo_segmento, 2)
+                instrucciones_detalladas[-1]["distancia_km"] += round(distancia_segmento / 1000, 2)
+
+
+        # Devuelve la nueva lista en la respuesta JSON
+        return jsonify({
+            'ruta': ruta_nodos, 
+            'tiempo': tiempo_total, 
+            'distancia': distancia_total / 1000,
+            'instrucciones': instrucciones_detalladas, # <<<--- NUEVO
+            'perfil_trafico': weight_key # <<<--- NUEVO (para saber qué perfil se usó)
+        })
     except (nx.NetworkXNoPath, nx.NodeNotFound):
         return jsonify({'error': 'No se encontró una ruta conectada en el grafo.'}), 404
-
-# ... (El resto de tu código para /calculadora y /calcular_ruta no necesita cambios urgentes,
-# pero idealmente también deberían usar esta lógica de tiempo dinámico)
-
 # ------------------- EJECUCIÓN DE LA APP -------------------
 if __name__ == '__main__':
     app.run(debug=True)

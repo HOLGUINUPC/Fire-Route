@@ -143,10 +143,31 @@
                                         if (routeLayer) {
                                             map.removeLayer(routeLayer); // Limpiar ruta anterior
                                         }
+
                                         if (data.ruta && data.ruta.length > 0) {
                                             routeLayer = L.polyline(data.ruta, { color: '#3388ff', weight: 5 }).addTo(map);
                                             map.fitBounds(routeLayer.getBounds().pad(0.1)); // Zoom a la ruta
+
+                                            // Actualiza el div de resultados como antes
                                             resultsDiv.innerHTML = `<p><strong>Tiempo estimado:</strong> ${data.tiempo.toFixed(2)} min</p><p><strong>Distancia:</strong> ${data.distancia.toFixed(2)} km</p>`;
+
+                                            // --- CÓDIGO NUEVO PARA LAS INSTRUCCIONES ---
+                                            const instruccionesElem = document.getElementById('instrucciones');
+                                            const perfilTrafico = data.perfil_trafico.replace('time_', '').replace('_', ' ').toUpperCase();
+
+                                            // Inicia el texto con un resumen
+                                            let instruccionesTexto = `Ruta calculada con perfil: ${perfilTrafico}\n--------------------------------------\n\n`;
+
+                                            // Recorre la lista de instrucciones recibida del servidor
+                                            data.instrucciones.forEach((paso, index) => {
+                                                // Formatea cada paso para que sea legible
+                                                instruccionesTexto += `${index + 1}. Tomar ${paso.calle}\n`;
+                                                instruccionesTexto += `   └─ (Tiempo: ${paso.tiempo.toFixed(2)} min, Distancia: ${paso.distancia_km.toFixed(2)} km)\n\n`;
+                                            });
+
+                                            // Asigna el texto formateado al textarea
+                                            instruccionesElem.value = instruccionesTexto;
+
                                         } else {
                                             resultsDiv.innerHTML = "<p style='color:red;'>No se pudo encontrar una ruta.</p>";
                                         }
