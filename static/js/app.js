@@ -21,23 +21,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCalcularRuta = document.getElementById('btnCalcularRuta');
     const btnAudioRadio = document.getElementById('btnAudioRadio');
 
+    // --- CÓDIGO PARA MOSTRAR LA HORA CON COLORES ---
     const elementoHora = document.getElementById('hora-actual');
 
-    function actualizarHora() {
+    function actualizarHoraConColor() {
         const ahora = new Date();
-        // toLocaleTimeString formatea la hora al formato local (ej: 12:27:20 PM)
-        // 'es-PE' es para el formato de Perú.
+        const horaActual = ahora.getHours(); // Obtiene la hora actual (0-23)
+
+        // 1. Actualiza el texto de la hora
         elementoHora.textContent = ahora.toLocaleTimeString('es-PE', {
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit'
         });
+
+        // 2. Aplica el color según la hora
+        // Hora Punta (rojo): 7-9am y 5-7pm
+        if ((horaActual >= 7 && horaActual < 10) || (horaActual >= 17 && horaActual < 20)) {
+            elementoHora.style.color = 'red';
+        }
+        // Hora Noche (azul): 11pm a 5am
+        else if (horaActual >= 23 || horaActual < 6) {
+            elementoHora.style.color = 'blue';
+        }
+        // Hora Normal (verde)
+        else {
+            elementoHora.style.color = 'green';
+        }
     }
 
-    actualizarHora();
+    // Llama a la función inmediatamente
+    actualizarHoraConColor();
 
-    // Configura un intervalo para que la función se ejecute cada segundo
-    setInterval(actualizarHora, 1000);
+    // Configura el intervalo para que se ejecute cada segundo
+    setInterval(actualizarHoraConColor, 1000);
 
     function showScreen(screenToShow) {
         if (!screenToShow) {
