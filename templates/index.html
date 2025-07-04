@@ -4,223 +4,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas Óptimas con Mapa</title>
-
+    <title>Fire Route App</title>
+    <!-- Only use Flask's static path for your local CSS/JS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-        }
-
-        #map {
-            height: 100vh;
-        }
-
-        .info-panel {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            width: 280px;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            font-size: 15px;
-            font-weight: bold;
-            background-color: #d9534f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        button2 {
-            width: 100%;
-            padding: 10px;
-            font-size: 15px;
-            font-weight: bold;
-            background-color: #31aa8c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-
-            .btn-clasica {
-                width: 100%;
-                padding: 10px;
-                font-size: 15px;
-                font-weight: bold;
-                background-color: #31aa8c;
-                /* Tu color verde */
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.2s;
-                margin-top: 10px;
-                /* Añadimos un margen para separarlo */
-            }
-
-
-
-
-
-
-        }
-
-        button:hover {
-            background-color: #c9302c;
-        }
-
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        #results {
-            margin-top: 15px;
-            font-size: 14px;
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </head>
 
 <body>
+    <div class="app-container">
+        <div class="content-wrapper">
+            <div id="mainScreen" class="screen active-screen">
+                <div class="logo-section">
+                    <img src="{{ url_for('static', filename='img/fireroute.png') }}">
+                    <h1 class="app-title">Fire Route</h1>
+                </div>
 
-    <div id="map"></div>
+                <button class="btn-emergency" id="btnAtender">
+                    Atender Emergencias
+                    <span class="notification-badge">1</span>
+                </button>
 
-    <div class="info-panel">
-        <h3>Planificador de Ruta</h3>
-        <p>1. Haz clic en el mapa para fijar el <strong>INICIO</strong>.</p>
-        <p>2. Haz clic de nuevo para fijar el <strong>FIN</strong>.</p>
+                <div class="button-group">
+                    <button class="btn-primary" id="btnGestionar">Gestionar Unidades</button>
+                    <button class="btn-primary" id="btnConsultar">Consultar Historial</button>
+                </div>
+            </div>
 
-        <button id="calculateBtn" disabled>Calcular Ruta</button>
+            <div id="screenEmergencias" class="screen">
+                <h2 class="screen-title">Atender Nueva Emergencia</h2>
+                <div class="emergency-content-layout">
+                    <div class="control-panel">
+                        <h3>Panel de Control</h3>
+                        <div class="input-group">
+                            <label for="ubicacion">Ubicación de la Emergencia</label>
+                            <input type="text" id="ubicacion" list="ubicaciones-opciones"
+                                placeholder="Escribe o selecciona..." class="control-input">
+                            <datalist id="ubicaciones-opciones"></datalist>
+                            <button class="input-action-btn">
+                                <img src="{{ url_for('static', filename='img/pin.png') }}" alt="Search">
+                                <button class="input-action-btn clear-btn">
+                                    <img src="{{ url_for('static', filename='img/x_icon_150997.png') }}" alt="Clear">
+                        </div>
+                        <div class="input-group">
+                            <label for="unidad">Unidad de Bomberos</label>
+                            <input type="text" id="unidad" list="unidades-opciones"
+                                placeholder="Escribe o selecciona..." class="control-input">
+                            <datalist id="unidades-opciones"></datalist>
+                        </div>
 
+                        <button id="btnCalcularRuta" class="btn-calculate">CALCULAR RUTA ÓPTIMA</button>
+                        <button id="resetBtn" class="btn-reset" color="gray">REINICIAR</button>
+                        <div class="route-results">
+                            <h4>RESULTADOS DE LA RUTA</h4>
+                            <p>Tiempo estimado de Llegada: <span id="tiempoEstimado"
+                                    class="result-value">HH:MM:SS</span></p>
+                            <p>Distancia: <span id="distancia" class="result-value">[XX km]</span></p>
+                        </div>
 
+                        <div class="instructions-group">
+                            <label for="instrucciones">Instrucciones:</label>
+                            <textarea id="instrucciones" rows="5" class="control-textarea"></textarea>
+                            <button id="btnAudioRadio" class="btn-audio-radio">AUDIO/RADIO</button>
+                        </div>
 
-        <button id="resetBtn" style="margin-top: 10px; background-color: #5bc0de;">Reiniciar</button>
+                        <p class="data-update-info">*Datos Actualizados hace 15 seg</p>
+                    </div>
 
-        <div id="results"></div>
+                    <div class="map-placeholder">
+                        <div id="map" style="width: 100%; height: 100vh;"></div>
+                        <script>
 
-        <button id="btnIrACalculadora" class="btn-clasica">Calculadora Clásica</button>
+                            window.map = L.map('map').setView([-12.08, -77.05], 13); // Centrado en Lima
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 50,
+                                attribution: '© OpenStreetMap'
+                            }).addTo(window.map);
+
+                            // Ícono rojo para el marcador de fin
+                            const redIcon = new L.Icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            });
+                            const calculateBtn = document.getElementById('btnCalcularRuta');
+                            const resultsDiv = document.querySelector('.route-results');
+                            const resetBtn = document.getElementById('resetBtn');
+                            // --- 2. Variables para guardar el estado ---
+                            let startPoint = null;
+                            let endPoint = null;
+                            let startMarker = null;
+                            let endMarker = null;
+                            let routeLayer = null;
+                            // --- 3. Lógica de Clics en el Mapa ---
+                            map.on('click', function (e) {
+                                if (!startPoint) {
+                                    startPoint = e.latlng;
+                                    startMarker = L.marker(startPoint, { draggable: true }).addTo(map).bindPopup('Punto de Inicio').openPopup();
+                                    // Actualizar coordenada si el marcador es arrastrado
+                                    startMarker.on('dragend', function (e) { startPoint = e.target.getLatLng(); });
+                                } else if (!endPoint) {
+                                    endPoint = e.latlng;
+                                    endMarker = L.marker(endPoint, { icon: redIcon, draggable: true }).addTo(map).bindPopup('Punto de Fin').openPopup();
+                                    endMarker.on('dragend', function (e) { endPoint = e.target.getLatLng(); });
+                                    calculateBtn.disabled = false; // Habilitar el botón de cálculo
+                                }
+                            });
+
+                            // --- 4. Lógica de los Botones ---
+                            calculateBtn.addEventListener('click', function () {
+                                resultsDiv.innerHTML = "Calculando...";
+                                calculateBtn.disabled = true;
+
+                                fetch('/ruta_json', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        start: [startPoint.lat, startPoint.lng],
+                                        end: [endPoint.lat, endPoint.lng]
+                                    })
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error(`Error del servidor: ${response.statusText}`);
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        if (routeLayer) {
+                                            map.removeLayer(routeLayer); // Limpiar ruta anterior
+                                        }
+                                        if (data.ruta && data.ruta.length > 0) {
+                                            routeLayer = L.polyline(data.ruta, { color: '#3388ff', weight: 5 }).addTo(map);
+                                            map.fitBounds(routeLayer.getBounds().pad(0.1)); // Zoom a la ruta
+                                            resultsDiv.innerHTML = `<p><strong>Tiempo estimado:</strong> ${data.tiempo.toFixed(2)} min</p><p><strong>Distancia:</strong> ${data.distancia.toFixed(2)} km</p>`;
+                                        } else {
+                                            resultsDiv.innerHTML = "<p style='color:red;'>No se pudo encontrar una ruta.</p>";
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        resultsDiv.innerHTML = "<p style='color:red;'>Ocurrió un error al calcular la ruta.</p>";
+                                    });
+                            });
+
+                            resetBtn.addEventListener('click', function () {
+                                if (startMarker) map.removeLayer(startMarker);
+                                if (endMarker) map.removeLayer(endMarker);
+                                if (routeLayer) map.removeLayer(routeLayer);
+
+                                startPoint = null;
+                                endPoint = null;
+                                startMarker = null;
+                                endMarker = null;
+                                routeLayer = null;
+
+                                calculateBtn.disabled = true;
+                                resultsDiv.innerHTML = "";
+                            });
+
+                        </script>
+                    </div>
+                </div>
+                <button class="btn-back" id="backFromEmergencias">Volver</button>
+            </div>
+
+            <div id="screenGestionar" class="screen">
+                <h2 class="screen-title">Gestionar Unidades</h2>
+                <p>-</p>
+                <button class="btn-back" id="backFromGestionar">Volver</button>
+            </div>
+
+            <div id="screenHistorial" class="screen">
+                <h2 class="screen-title">Consultar Historial</h2>
+                <p>-</p>
+                <button class="btn-back" id="backFromHistorial">Volver</button>
+            </div>
+
+            <div class="app-footer">
+                <p>
+                    <a href="contacto.html">Contacto</a> |
+                    <a href="soporte.html">Soporte</a> |
+                    <a href="derechos.html">Derechos Reservados</a>
+                </p>
+            </div>
+        </div>
     </div>
 
-
-    <script>
-
-        document.getElementById('btnIrACalculadora').addEventListener('click', function () {
-            window.location.href = '/calculadora';
-        });
-        // --- 1. Inicialización del Mapa ---
-        const map = L.map('map').setView([-12.08, -77.05], 13); // Centrado en Lima
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // --- 2. Variables para guardar el estado ---
-        let startPoint = null;
-        let endPoint = null;
-        let startMarker = null;
-        let endMarker = null;
-        let routeLayer = null;
-
-        const calculateBtn = document.getElementById('calculateBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const resultsDiv = document.getElementById('results');
-
-        // Ícono rojo para el marcador de fin
-        const redIcon = new L.Icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-
-        // --- 3. Lógica de Clics en el Mapa ---
-        map.on('click', function (e) {
-            if (!startPoint) {
-                startPoint = e.latlng;
-                startMarker = L.marker(startPoint, { draggable: true }).addTo(map).bindPopup('Punto de Inicio').openPopup();
-                // Actualizar coordenada si el marcador es arrastrado
-                startMarker.on('dragend', function (e) { startPoint = e.target.getLatLng(); });
-            } else if (!endPoint) {
-                endPoint = e.latlng;
-                endMarker = L.marker(endPoint, { icon: redIcon, draggable: true }).addTo(map).bindPopup('Punto de Fin').openPopup();
-                endMarker.on('dragend', function (e) { endPoint = e.target.getLatLng(); });
-                calculateBtn.disabled = false; // Habilitar el botón de cálculo
-            }
-        });
-
-        // --- 4. Lógica de los Botones ---
-        calculateBtn.addEventListener('click', function () {
-            resultsDiv.innerHTML = "Calculando...";
-            calculateBtn.disabled = true;
-
-            fetch('/ruta_json', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    start: [startPoint.lat, startPoint.lng],
-                    end: [endPoint.lat, endPoint.lng]
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Error del servidor: ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (routeLayer) {
-                        map.removeLayer(routeLayer); // Limpiar ruta anterior
-                    }
-                    if (data.ruta && data.ruta.length > 0) {
-                        routeLayer = L.polyline(data.ruta, { color: '#3388ff', weight: 5 }).addTo(map);
-                        map.fitBounds(routeLayer.getBounds().pad(0.1)); // Zoom a la ruta
-                        resultsDiv.innerHTML = `<p><strong>Tiempo estimado:</strong> ${data.tiempo.toFixed(2)} min</p><p><strong>Distancia:</strong> ${data.distancia.toFixed(2)} km</p>`;
-                    } else {
-                        resultsDiv.innerHTML = "<p style='color:red;'>No se pudo encontrar una ruta.</p>";
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    resultsDiv.innerHTML = "<p style='color:red;'>Ocurrió un error al calcular la ruta.</p>";
-                });
-        });
-
-        resetBtn.addEventListener('click', function () {
-            if (startMarker) map.removeLayer(startMarker);
-            if (endMarker) map.removeLayer(endMarker);
-            if (routeLayer) map.removeLayer(routeLayer);
-
-            startPoint = null;
-            endPoint = null;
-            startMarker = null;
-            endMarker = null;
-            routeLayer = null;
-
-            calculateBtn.disabled = true;
-            resultsDiv.innerHTML = "";
-        });
-
-    </script>
 </body>
 
 </html>

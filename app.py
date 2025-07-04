@@ -89,7 +89,7 @@ if GRAFO is None:
 # --- Rutas para la Interfaz del MAPA ---
 @app.route('/')
 def index():
-    return render_template('index2.html')
+    return render_template('index.html')
 
 @app.route('/ruta_json', methods=['POST'])
 def ruta_json():
